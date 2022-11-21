@@ -1,0 +1,59 @@
+version: "3"
+services:
+  webserver:
+    build: 
+      context: requirements/nginx
+      dockerfile: Dockerfile
+    image: nginx
+    container_name: inception_nginx
+    restart: unless-stopped
+    ports:
+      - "433:433"
+    volumes:
+      - "~/home/svalenti/data/wd:/var/lib/mysql"
+    networks:
+      - frontend
+  application:
+    build:
+      context: requirements/wordpress
+      dockerfile: Dockerfile
+    image: wordpress
+    container_name: inception_word
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - "~/home/svalenti/data/wd:/var/lib/mysql"
+    networks:
+      - backend
+  db:
+    build:
+      context: requirements/mariadb
+      dockerfile: Dockerfile
+    image: mariadb
+    container_name: inception_mariadb
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - "~/home/svalenti/data/db:/var/lib/mysql"
+    networks:
+      - backend
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+      #volumes:
+  #db:
+    #driver: local
+      # driver_opts:
+      #type: none
+     #o: bind
+    # device: home/svalenti/data/db
+    # wd:
+    # driver: local
+    # driver_opts:
+    # type: none
+    # o: bind
+    # device: home/svalenti/data/wd
